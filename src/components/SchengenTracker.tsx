@@ -2,51 +2,49 @@ import { subDays, format } from 'date-fns';
 import type { Trip } from '../types';
 import { schengenDaysUsed } from '../utils/schengen';
 
-interface Props {
-  trips: Trip[];
-}
+interface Props { trips: Trip[] }
 
 export function SchengenTracker({ trips }: Props) {
   const today = new Date();
   const daysUsed = schengenDaysUsed(trips, today);
   const daysRemaining = Math.max(0, 90 - daysUsed);
-  const percentage = Math.min(100, (daysUsed / 90) * 100);
+  const pct = Math.min(100, (daysUsed / 90) * 100);
   const windowStart = subDays(today, 179);
 
-  const isWarning = daysUsed >= 75;
   const isDanger = daysUsed >= 85;
-
-  const barColor = isDanger ? 'bg-red-500' : isWarning ? 'bg-amber-500' : 'bg-violet-500';
-  const statusColor = isDanger ? 'text-red-400' : isWarning ? 'text-amber-400' : 'text-emerald-400';
+  const isWarning = daysUsed >= 75;
+  const barColor = isDanger ? '#f87171' : isWarning ? '#fbbf24' : '#7c5cfc';
 
   return (
-    <div className="bg-slate-800 rounded-lg p-6 border border-slate-700">
-      <div className="flex items-center justify-between mb-1">
-        <h3 className="text-lg font-semibold text-slate-100">Schengen 90/180</h3>
-        <span className="text-xs text-slate-500 bg-slate-700 px-2 py-1 rounded">
-          Rolling window
-        </span>
-      </div>
-      <p className="text-xs text-slate-500 mb-4">
-        {format(windowStart, 'MMM d, yyyy')} → {format(today, 'MMM d, yyyy')}
-      </p>
-
-      <div className="flex items-baseline gap-2 mb-3">
-        <span className="text-4xl font-bold text-slate-100">{daysUsed}</span>
-        <span className="text-slate-400">/ 90 days used</span>
+    <div className="bg-surface-raised rounded-2xl p-5 border border-border-subtle card-glow">
+      <div className="flex items-start justify-between mb-4">
+        <div>
+          <p className="text-[13px] text-text-tertiary font-medium uppercase tracking-wider">Schengen 90/180</p>
+          <p className="text-[11px] text-text-tertiary mt-0.5">
+            {format(windowStart, 'MMM d')} – {format(today, 'MMM d, yyyy')}
+          </p>
+        </div>
+        <div className="w-8 h-8 rounded-lg bg-accent-soft flex items-center justify-center">
+          <span className="text-accent text-sm">EU</span>
+        </div>
       </div>
 
-      <div className="w-full bg-slate-700 rounded-full h-3 mb-3 overflow-hidden">
+      <div className="flex items-baseline gap-1.5 mb-4">
+        <span className="text-[40px] font-bold tracking-tight tabular-nums leading-none">{daysUsed}</span>
+        <span className="text-text-tertiary text-sm">/ 90</span>
+      </div>
+
+      <div className="w-full bg-surface-overlay rounded-full h-1.5 mb-3 overflow-hidden">
         <div
-          className={`${barColor} h-full rounded-full transition-all duration-500`}
-          style={{ width: `${percentage}%` }}
+          className="h-full rounded-full progress-fill"
+          style={{ width: `${pct}%`, backgroundColor: barColor }}
         />
       </div>
 
-      <p className={`text-sm font-medium ${statusColor}`}>
+      <p className="text-[13px] font-medium" style={{ color: barColor === '#7c5cfc' ? '#34d399' : barColor }}>
         {daysRemaining} days remaining
-        {isWarning && !isDanger && ' — Approaching limit'}
-        {isDanger && ' — Near limit!'}
+        {isDanger && ' · Near limit'}
+        {isWarning && !isDanger && ' · Approaching'}
       </p>
     </div>
   );

@@ -4,35 +4,24 @@ import { Timeline } from '../components/Timeline';
 
 export function TimelinePage() {
   const { trips } = useTripsContext();
-  const currentYear = new Date().getFullYear();
-  const [year, setYear] = useState(currentYear);
-
-  const years = Array.from(
-    new Set([currentYear, currentYear - 1, currentYear - 2])
-  ).sort((a, b) => b - a);
+  const now = new Date().getFullYear();
+  const [year, setYear] = useState(now);
+  const years = [now, now - 1, now - 2];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-slate-100">Timeline</h2>
-        <div className="flex gap-2">
+        <p className="text-[13px] text-text-tertiary font-medium uppercase tracking-wider">Timeline</p>
+        <div className="flex gap-1">
           {years.map(y => (
-            <button
-              key={y}
-              onClick={() => setYear(y)}
-              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors cursor-pointer ${
-                y === year
-                  ? 'bg-violet-600 text-white'
-                  : 'bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-700'
-              }`}
-            >
-              {y}
-            </button>
+            <button key={y} onClick={() => setYear(y)}
+              className={`px-3 py-1 rounded-lg text-[12px] font-medium transition-all cursor-pointer ${
+                y === year ? 'bg-accent text-white' : 'bg-surface-overlay text-text-tertiary hover:text-text-secondary'
+              }`}>{y}</button>
           ))}
         </div>
       </div>
-
-      <div className="bg-slate-800 rounded-lg p-6 border border-slate-700">
+      <div className="bg-surface-raised rounded-2xl p-5 border border-border-subtle card-glow">
         <Timeline trips={trips} year={year} />
       </div>
     </div>

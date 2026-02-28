@@ -1,11 +1,48 @@
 @import "tailwindcss";
 
+@theme {
+  --color-surface: #0a0a0f;
+  --color-surface-raised: #12121a;
+  --color-surface-overlay: #1a1a25;
+  --color-border-subtle: rgba(255, 255, 255, 0.06);
+  --color-border-default: rgba(255, 255, 255, 0.1);
+  --color-accent: #7c5cfc;
+  --color-accent-soft: rgba(124, 92, 252, 0.12);
+  --color-text-primary: #ededf0;
+  --color-text-secondary: #8a8a9a;
+  --color-text-tertiary: #55556a;
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-danger: #f87171;
+}
+
 html {
   color-scheme: dark;
 }
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
   min-width: 320px;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+.tabular-nums { font-variant-numeric: tabular-nums; }
+
+.card-glow {
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.card-glow:hover {
+  border-color: rgba(124, 92, 252, 0.15);
+  box-shadow: 0 0 0 1px rgba(124, 92, 252, 0.05), 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+
+.progress-fill {
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.7);
 }
