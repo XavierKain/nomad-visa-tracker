@@ -8,17 +8,15 @@ interface TripsContextType {
   addTrip: (trip: Omit<Trip, 'id'>) => void;
   updateTrip: (trip: Trip) => void;
   deleteTrip: (id: string) => void;
+  clearTrips: () => void;
+  importTrips: (data: Trip[]) => void;
 }
 
 const TripsContext = createContext<TripsContextType | null>(null);
 
 export function TripsProvider({ children }: { children: ReactNode }) {
-  const tripsState = useTrips();
-  return (
-    <TripsContext.Provider value={tripsState}>
-      {children}
-    </TripsContext.Provider>
-  );
+  const state = useTrips();
+  return <TripsContext.Provider value={state}>{children}</TripsContext.Provider>;
 }
 
 export function useTripsContext() {

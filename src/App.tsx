@@ -3,6 +3,7 @@ import { Layout } from './components/Layout';
 import { DashboardPage } from './pages/DashboardPage';
 import { TripsPage } from './pages/TripsPage';
 import { TimelinePage } from './pages/TimelinePage';
+import { SettingsPage } from './pages/SettingsPage';
 
 const router = createHashRouter([
   {
@@ -12,6 +13,7 @@ const router = createHashRouter([
       { index: true, element: <DashboardPage /> },
       { path: 'trips', element: <TripsPage /> },
       { path: 'timeline', element: <TimelinePage /> },
+      { path: 'settings', element: <SettingsPage /> },
     ],
   },
 ]);

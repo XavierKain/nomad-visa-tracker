@@ -7,9 +7,7 @@ function loadTrips(): Trip[] {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     return stored ? JSON.parse(stored) : [];
-  } catch {
-    return [];
-  }
+  } catch { return []; }
 }
 
 function saveTrips(trips: Trip[]) {
@@ -21,28 +19,33 @@ export function useTrips() {
 
   const addTrip = useCallback((trip: Omit<Trip, 'id'>) => {
     const newTrip: Trip = { ...trip, id: crypto.randomUUID() };
-    setTrips(prev => {
-      const updated = [...prev, newTrip];
-      saveTrips(updated);
-      return updated;
-    });
+    setTrips(prev => { const u = [...prev, newTrip]; saveTrips(u); return u; });
   }, []);
 
   const updateTrip = useCallback((trip: Trip) => {
-    setTrips(prev => {
-      const updated = prev.map(t => t.id === trip.id ? trip : t);
-      saveTrips(updated);
-      return updated;
-    });
+    setTrips(prev => { const u = prev.map(t => t.id === trip.id ? trip : t); saveTrips(u); return u; });
   }, []);
 
   const deleteTrip = useCallback((id: string) => {
+    setTrips(prev => { const u = prev.filter(t => t.id !== id); saveTrips(u); return u; });
+  }, []);
+
+  const clearTrips = useCallback(() => {
+    setTrips([]); saveTrips([]);
+  }, []);
+
+  const importTrips = useCallback((data: Trip[]) => {
     setTrips(prev => {
-      const updated = prev.filter(t => t.id !== id);
-      saveTrips(updated);
-      return updated;
+      const merged = [...prev];
+      for (const t of data) {
+        if (!merged.find(e => e.id === t.id)) {
+          merged.push({ ...t, id: t.id || crypto.randomUUID() });
+        }
+      }
+      saveTrips(merged);
+      return merged;
     });
   }, []);
 
-  return { trips, addTrip, updateTrip, deleteTrip };
+  return { trips, addTrip, updateTrip, deleteTrip, clearTrips, importTrips };
 }
