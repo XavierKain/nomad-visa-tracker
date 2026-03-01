@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nomad Visa Tracker — Schengen 90/180, US Visa Limits & Tax Residency Alerts</title>
+<meta name="description" content="Track your Schengen 90/180-day limit, US visa stays, and tax residency thresholds. Offline-first, one-time purchase. Built for digital nomads and frequent travelers.">
+<meta name="keywords" content="visa tracker, schengen calculator, digital nomad, 90/180 rule, tax residency, visa overstay, nomad tools">
+<link rel="canonical" href="./app/">
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Nomad Visa Tracker — Stay Legal Everywhere You Go">
+<meta property="og:description" content="Schengen 90/180 counter, US visa tracking, tax residency warnings. One-time $4.99 purchase. Offline-first.">
+<meta property="og:image" content="https://xavierkain.github.io/nomad-visa-tracker/og-image.png">
+<meta property="og:url" content="./app/">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Nomad Visa Tracker — Stay Legal Everywhere You Go">
+<meta name="twitter:description" content="Schengen 90/180 counter, US visa tracking, tax residency warnings. One-time $4.99 purchase.">
+
+<!-- JSON-LD -->
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Nomad Visa Tracker",
+    "description": "Track Schengen 90/180-day limits, US visa stays, and tax residency thresholds. Offline-first app for digital nomads.",
+    "applicationCategory": "TravelApplication",
+    "operatingSystem": "Web",
+    "offers": {
+        "@type": "Offer",
+        "price": "4.99",
+        "priceCurrency": "USD"
+    },
+    "url": "./app/"
+}
+</script>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ===== RESET ===== */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+:root {
+    --white: #FFFFFF;
+    --off-white: #F8FAFC;
+    --gray-50: #F1F5F9;
+    --gray-100: #E2E8F0;
+    --gray-200: #CBD5E1;
+    --gray-300: #94A3B8;
+    --gray-400: #64748B;
+    --gray-500: #475569;
+    --gray-600: #334155;
+    --gray-700: #1E293B;
+    --gray-800: #0F172A;
+    --teal: #0891B2;
+    --teal-light: #06B6D4;
+    --teal-50: #ECFEFF;
+    --teal-100: #CFFAFE;
+    --teal-700: #0E7490;
+    --red-500: #EF4444;
+    --red-50: #FEF2F2;
+    --amber-500: #F59E0B;
+    --amber-50: #FFFBEB;
+    --green-500: #22C55E;
+    --green-50: #F0FDF4;
+    --font-h: 'Space Grotesk', system-ui, sans-serif;
+    --font-b: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+html { scroll-behavior: smooth }
+
+body {
+    font-family: var(--font-b);
+    color: var(--gray-700);
+    background: var(--white);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ===== UTILITIES ===== */
+.container { max-width: 1120px; margin: 0 auto; padding: 0 24px }
+
+/* ===== PASSPORT STAMPS (decorative) ===== */
+.stamp {
+    position: absolute;
+    border: 2px solid var(--gray-100);
+    opacity: 0.3;
+    pointer-events: none;
+    z-index: 0;
+}
+.stamp::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    border: 1px dashed var(--gray-100);
+}
+.stamp-circle { border-radius: 50% }
+.stamp-circle::after { border-radius: 50% }
+.stamp-rect { border-radius: 6px }
+.stamp-rect::after { border-radius: 3px }
+
+.stamp-a { width: 110px; height: 110px; top: 200px; right: -25px }
+.stamp-a::after { width: 80px; height: 80px }
+.stamp-b { width: 75px; height: 75px; top: 420px; left: -15px }
+.stamp-b::after { width: 50px; height: 50px }
+.stamp-c { width: 90px; height: 60px; bottom: 140px; right: 80px; transform: rotate(12deg) }
+.stamp-c::after { width: 60px; height: 35px }
+.stamp-d { width: 65px; height: 65px; top: 80px; left: 40px }
+.stamp-d::after { width: 42px; height: 42px }
+
+/* ===== NAV ===== */
+nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.nav-inner {
+    display: flex; align-items: center; justify-content: space-between; height: 64px;
+}
+
+.nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none; color: var(--gray-800);
+    font-family: var(--font-h); font-weight: 700; font-size: 1.05rem;
+}
+
+.nav-logo svg { width: 26px; height: 26px }
+
+.nav-links {
+    display: flex; align-items: center; gap: 28px; list-style: none;
+}
+
+.nav-links a {
+    text-decoration: none; color: var(--gray-500);
+    font-size: 0.88rem; font-weight: 500; transition: color 0.2s;
+}
+
+.nav-links a:hover { color: var(--teal) }
+
+.nav-cta {
+    background: var(--teal) !important; color: var(--white) !important;
+    padding: 8px 20px !important; border-radius: 8px;
+    font-weight: 600 !important; transition: background 0.2s !important;
+}
+
+.nav-cta:hover { background: var(--teal-700) !important }
+
+.nav-toggle {
+    display: none; background: none; border: none; cursor: pointer; padding: 4px;
+}
+
+.nav-toggle span {
+    display: block; width: 22px; height: 2px;
+    background: var(--gray-600); margin: 5px 0; border-radius: 2px;
+}
+
+/* ===== HERO ===== */
+.hero {
+    padding: 112px 0 80px;
+    position: relative; overflow: hidden;
+    background: var(--off-white);
+}
+
+.hero-dots {
+    position: absolute; inset: 0;
+    background-image: radial-gradient(circle at 1px 1px, var(--gray-200) 0.5px, transparent 0);
+    background-size: 28px 28px;
+    opacity: 0.35; pointer-events: none;
+}
+
+.hero .container { position: relative; z-index: 1 }
+
+/* Dashboard mockup */
+.dashboard {
+    max-width: 740px; margin: 0 auto 52px;
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 12px 40px rgba(0,0,0,0.07);
+    border: 1px solid var(--gray-100);
+    overflow: hidden;
+}
+
+.dash-bar {
+    display: flex; align-items: center; gap: 7px;
+    padding: 12px 18px;
+    background: var(--off-white); border-bottom: 1px solid var(--gray-100);
+}
+
+.dash-dot {
+    width: 10px; height: 10px; border-radius: 50%; background: var(--gray-200);
+}
+.dash-dot:nth-child(1) { background: #FCA5A5 }
+.dash-dot:nth-child(2) { background: #FCD34D }
+.dash-dot:nth-child(3) { background: #86EFAC }
+
+.dash-bar-title {
+    flex: 1; text-align: center;
+    font-size: 0.75rem; color: var(--gray-400); font-weight: 500;
+}
+
+.dash-body { padding: 28px 24px 24px }
+
+.dash-head {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    margin-bottom: 24px; gap: 12px; flex-wrap: wrap;
+}
+
+.dash-greeting {
+    font-family: var(--font-h); font-size: 1.12rem;
+    font-weight: 600; color: var(--gray-800);
+}
+
+.dash-date {
+    font-size: 0.8rem; color: var(--gray-400); margin-top: 2px;
+}
+
+.warning-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--amber-50); border: 1px solid #FDE68A;
+    color: #92400E; padding: 5px 13px; border-radius: 20px;
+    font-size: 0.76rem; font-weight: 600;
+    animation: badge-glow 3s ease-in-out infinite;
+}
+
+@keyframes badge-glow {
+    0%,100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.15) }
+    50% { box-shadow: 0 0 0 8px rgba(245,158,11,0) }
+}
+
+.warning-badge svg { width: 13px; height: 13px; flex-shrink: 0 }
+
+/* Ring cards */
+.dash-rings {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+    margin-bottom: 20px;
+}
+
+.ring-card {
+    background: var(--off-white); border-radius: 14px;
+    padding: 24px 16px; display: flex; flex-direction: column;
+    align-items: center; border: 1px solid var(--gray-100);
+}
+
+.ring-label {
+    font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.07em; color: var(--gray-400); margin-bottom: 14px;
+}
+
+.ring-wrap {
+    position: relative; width: 120px; height: 120px; margin-bottom: 10px;
+}
+
+.ring-svg {
+    width: 120px; height: 120px; transform: rotate(-90deg);
+}
+
+.ring-bg { fill: none; stroke: var(--gray-100); stroke-width: 8 }
+
+.ring-fill {
+    fill: none; stroke-width: 8; stroke-linecap: round;
+    transition: stroke-dashoffset 1.6s cubic-bezier(0.4,0,0.2,1);
+}
+
+.ring-fill-teal { stroke: var(--teal) }
+.ring-fill-amber { stroke: var(--amber-500) }
+
+.ring-center {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+
+.ring-num {
+    font-family: var(--font-h); font-size: 1.9rem;
+    font-weight: 700; color: var(--gray-800); line-height: 1;
+}
+
+.ring-of {
+    font-size: 0.78rem; color: var(--gray-400); font-weight: 500;
+}
+
+.ring-sub {
+    font-size: 0.8rem; color: var(--gray-500); font-weight: 500;
+}
+
+/* Country tags */
+.dash-countries { display: flex; gap: 8px; flex-wrap: wrap }
+
+.country-tag {
+    display: flex; align-items: center; gap: 5px;
+    background: var(--white); border: 1px solid var(--gray-100);
+    padding: 5px 10px; border-radius: 7px;
+    font-size: 0.76rem; font-weight: 500; color: var(--gray-600);
+}
+
+.country-tag .f { font-size: 0.95rem; line-height: 1 }
+
+.country-tag .d {
+    color: var(--teal); font-weight: 700; font-family: var(--font-h);
+}
+
+/* Hero text */
+.hero-text {
+    text-align: center; max-width: 600px; margin: 0 auto;
+}
+
+.hero-text h1 {
+    font-family: var(--font-h); font-size: 2.5rem;
+    font-weight: 700; color: var(--gray-800);
+    line-height: 1.15; margin-bottom: 16px;
+}
+
+.hero-text h1 span { color: var(--teal) }
+
+.hero-text p {
+    font-size: 1.08rem; color: var(--gray-500);
+    margin-bottom: 32px; line-height: 1.7;
+}
+
+.hero-btns {
+    display: flex; align-items: center; justify-content: center;
+    gap: 14px; flex-wrap: wrap;
+}
+
+.btn-p, .btn-s {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 13px 28px; border-radius: 12px;
+    font-weight: 600; font-size: 0.95rem;
+    text-decoration: none; transition: all 0.2s; cursor: pointer; border: none;
+}
+
+.btn-p {
+    background: var(--teal); color: var(--white);
+}
+.btn-p:hover { background: var(--teal-700); transform: translateY(-1px) }
+
+.btn-s {
+    background: var(--white); color: var(--gray-600);
+    border: 1px solid var(--gray-200);
+}
+.btn-s:hover { border-color: var(--teal); color: var(--teal); transform: translateY(-1px) }
+
+.btn-p svg, .btn-s svg { width: 17px; height: 17px }
+
+/* ===== FEATURES TIMELINE ===== */
+.features-section { padding: 100px 0; position: relative }
+
+.sec-label {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 0.76rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--teal); margin-bottom: 12px;
+}
+
+.sec-label::before {
+    content: ''; width: 20px; height: 2px;
+    background: var(--teal); border-radius: 2px;
+}
+
+.sec-heading {
+    font-family: var(--font-h); font-size: 2rem;
+    font-weight: 700; color: var(--gray-800);
+    line-height: 1.2; margin-bottom: 14px;
+}
+
+.sec-sub {
+    font-size: 1rem; color: var(--gray-500);
+    max-width: 520px; line-height: 1.7; margin-bottom: 52px;
+}
+
+.timeline { position: relative; max-width: 660px; margin: 0 auto }
+
+.timeline::before {
+    content: ''; position: absolute;
+    left: 19px; top: 0; bottom: 0; width: 2px;
+    background: linear-gradient(to bottom, var(--teal-100), var(--gray-100));
+}
+
+.tl-item {
+    position: relative; padding-left: 58px; padding-bottom: 44px;
+}
+
+.tl-item:last-child { padding-bottom: 0 }
+
+.tl-dot {
+    position: absolute; left: 11px; top: 4px;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--white); border: 3px solid var(--teal);
+    z-index: 1; transition: background 0.25s;
+}
+
+.tl-item:hover .tl-dot { background: var(--teal-100) }
+
+.tl-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 10px;
+}
+
+.tl-icon svg { width: 20px; height: 20px }
+
+.tl-icon.ic-teal { background: var(--teal-50) }
+.tl-icon.ic-teal svg { stroke: var(--teal) }
+
+.tl-icon.ic-amber { background: var(--amber-50) }
+.tl-icon.ic-amber svg { stroke: var(--amber-500) }
+
+.tl-icon.ic-green { background: var(--green-50) }
+.tl-icon.ic-green svg { stroke: var(--green-500) }
+
+.tl-title {
+    font-family: var(--font-h); font-size: 1.1rem;
+    font-weight: 600; color: var(--gray-800); margin-bottom: 5px;
+}
+
+.tl-desc {
+    font-size: 0.9rem; color: var(--gray-500); line-height: 1.7;
+}
+
+/* ===== 90/180 PROBLEM ===== */
+.problem-section {
+    padding: 100px 0; background: var(--off-white);
+    position: relative; overflow: hidden;
+}
+
+.problem-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 56px; align-items: center;
+}
+
+.problem-content .sec-sub { max-width: 100%; margin-bottom: 28px }
+
+.prob-list { list-style: none; display: flex; flex-direction: column; gap: 14px }
+
+.prob-list li {
+    display: flex; gap: 12px; align-items: flex-start;
+    font-size: 0.92rem; color: var(--gray-600); line-height: 1.6;
+}
+
+.prob-icon {
+    flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; margin-top: 1px;
+}
+
+.prob-icon svg { width: 13px; height: 13px }
+
+.prob-icon.ic-r { background: var(--red-50) }
+.prob-icon.ic-r svg { stroke: var(--red-500) }
+
+.prob-icon.ic-g { background: var(--green-50) }
+.prob-icon.ic-g svg { stroke: var(--green-500) }
+
+/* Rolling window visual */
+.window-card {
+    background: var(--white); border-radius: 16px;
+    padding: 28px; border: 1px solid var(--gray-100);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06);
+}
+
+.window-title {
+    font-family: var(--font-h); font-size: 0.82rem;
+    font-weight: 600; color: var(--gray-500);
+    text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 22px;
+}
+
+.window-bars { display: flex; flex-direction: column; gap: 14px }
+
+.wb { position: relative }
+
+.wb-label {
+    font-size: 0.76rem; font-weight: 500; color: var(--gray-500);
+    margin-bottom: 5px; display: flex; justify-content: space-between;
+}
+
+.wb-track {
+    height: 9px; background: var(--gray-50); border-radius: 5px; overflow: hidden;
+}
+
+.wb-fill {
+    height: 100%; border-radius: 5px;
+    transition: width 1.4s cubic-bezier(0.4,0,0.2,1);
+}
+
+.wb-fill.safe { background: var(--teal) }
+.wb-fill.warn { background: var(--amber-500) }
+.wb-fill.danger { background: var(--red-500) }
+
+.window-note {
+    margin-top: 18px; padding: 11px 14px;
+    background: var(--teal-50); border-radius: 8px;
+    border-left: 3px solid var(--teal);
+    font-size: 0.8rem; color: var(--gray-600); line-height: 1.6;
+}
+
+/* ===== WHO USES IT ===== */
+.users-section { padding: 100px 0 }
+
+.users-section .sec-label,
+.users-section .sec-heading,
+.users-section .sec-sub { text-align: center }
+
+.users-section .sec-label { justify-content: center }
+.users-section .sec-sub { margin-left: auto; margin-right: auto }
+
+.users-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
+}
+
+.u-card {
+    background: var(--white); border: 1px solid var(--gray-100);
+    border-radius: 14px; padding: 28px 20px; text-align: center;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.u-card:hover {
+    border-color: var(--teal-100);
+    box-shadow: 0 4px 16px rgba(8,145,178,0.08);
+}
+
+.u-icon {
+    width: 48px; height: 48px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 14px; background: var(--teal-50);
+}
+
+.u-icon svg { width: 22px; height: 22px; stroke: var(--teal) }
+
+.u-card h3 {
+    font-family: var(--font-h); font-size: 0.98rem;
+    font-weight: 600; color: var(--gray-800); margin-bottom: 6px;
+}
+
+.u-card p { font-size: 0.84rem; color: var(--gray-500); line-height: 1.6 }
+
+/* ===== PRICING ===== */
+.pricing-section { padding: 100px 0; background: var(--off-white) }
+
+.pricing-section .sec-label,
+.pricing-section .sec-heading,
+.pricing-section .sec-sub { text-align: center }
+
+.pricing-section .sec-label { justify-content: center }
+.pricing-section .sec-sub { margin-left: auto; margin-right: auto }
+
+.p-card {
+    max-width: 400px; margin: 0 auto;
+    background: var(--white); border-radius: 18px;
+    border: 2px solid var(--teal);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 12px 40px rgba(8,145,178,0.1);
+    overflow: hidden;
+}
+
+.p-card-head {
+    padding: 28px 28px 22px; text-align: center;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.p-badge {
+    display: inline-block; background: var(--teal-50); color: var(--teal);
+    font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; padding: 4px 12px; border-radius: 20px;
+    margin-bottom: 14px;
+}
+
+.p-amount {
+    font-family: var(--font-h); font-size: 3rem;
+    font-weight: 700; color: var(--gray-800); line-height: 1;
+}
+
+.p-amount span {
+    font-size: 1.1rem; color: var(--gray-400);
+    font-weight: 500; vertical-align: super;
+}
+
+.p-note { font-size: 0.86rem; color: var(--gray-400); margin-top: 6px }
+
+.p-card-body { padding: 24px 28px 28px }
+
+.p-feats { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px }
+
+.p-feats li {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 0.9rem; color: var(--gray-600);
+}
+
+.p-feats li svg { width: 17px; height: 17px; stroke: var(--teal); flex-shrink: 0 }
+
+.p-cta {
+    display: block; width: 100%; text-align: center;
+    background: var(--teal); color: var(--white);
+    padding: 13px; border-radius: 12px; text-decoration: none;
+    font-weight: 600; font-size: 0.95rem; transition: background 0.2s, transform 0.15s;
+}
+
+.p-cta:hover { background: var(--teal-700); transform: translateY(-1px) }
+
+/* ===== FAQ ===== */
+.faq-section { padding: 100px 0 }
+
+.faq-section .sec-label,
+.faq-section .sec-heading { text-align: center }
+
+.faq-section .sec-label { justify-content: center }
+.faq-section .sec-heading { margin-bottom: 44px }
+
+.faq-list {
+    max-width: 660px; margin: 0 auto;
+    display: flex; flex-direction: column; gap: 10px;
+}
+
+.faq-list details {
+    background: var(--white); border: 1px solid var(--gray-100);
+    border-radius: 12px; overflow: hidden; transition: border-color 0.2s;
+}
+
+.faq-list details[open] { border-color: var(--teal-100) }
+
+.faq-list summary {
+    padding: 16px 22px;
+    font-family: var(--font-h); font-size: 0.95rem;
+    font-weight: 600; color: var(--gray-700); cursor: pointer;
+    list-style: none; display: flex; align-items: center;
+    justify-content: space-between; gap: 16px;
+    user-select: none; transition: color 0.2s;
+}
+
+.faq-list summary:hover { color: var(--teal) }
+.faq-list summary::-webkit-details-marker { display: none }
+
+.faq-list summary::after {
+    content: ''; width: 9px; height: 9px;
+    border-right: 2px solid var(--gray-400);
+    border-bottom: 2px solid var(--gray-400);
+    transform: rotate(45deg); transition: transform 0.2s; flex-shrink: 0;
+}
+
+.faq-list details[open] summary::after { transform: rotate(-135deg) }
+
+.faq-answer {
+    padding: 0 22px 16px;
+    font-size: 0.9rem; color: var(--gray-500); line-height: 1.7;
+}
+
+/* ===== FOOTER ===== */
+footer {
+    background: var(--gray-800); color: var(--gray-300); padding: 44px 0;
+}
+
+.footer-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 20px;
+}
+
+.footer-brand {
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--font-h); font-weight: 600;
+    font-size: 1rem; color: var(--white);
+}
+
+.footer-brand svg { width: 22px; height: 22px }
+
+.footer-links {
+    display: flex; gap: 24px; list-style: none; flex-wrap: wrap;
+}
+
+.footer-links a {
+    color: var(--gray-400); text-decoration: none;
+    font-size: 0.86rem; transition: color 0.2s;
+}
+
+.footer-links a:hover { color: var(--teal-light) }
+
+.footer-copy {
+    width: 100%; text-align: center;
+    font-size: 0.8rem; color: var(--gray-500);
+    margin-top: 20px; padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 920px) {
+    .problem-grid { grid-template-columns: 1fr; gap: 40px }
+    .users-grid { grid-template-columns: repeat(2, 1fr) }
+}
+
+@media (max-width: 680px) {
+    .nav-links {
+        display: none; position: absolute;
+        top: 64px; left: 0; right: 0;
+        background: var(--white); flex-direction: column;
+        padding: 20px 24px; gap: 18px;
+        border-bottom: 1px solid var(--gray-100);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+    .nav-links.open { display: flex }
+    .nav-toggle { display: block }
+
+    .hero { padding: 96px 0 56px }
+    .hero-text h1 { font-size: 1.9rem }
+    .dash-body { padding: 18px 14px }
+    .dash-rings { grid-template-columns: 1fr; gap: 14px }
+    .ring-wrap { width: 100px; height: 100px }
+    .ring-svg { width: 100px; height: 100px }
+    .ring-num { font-size: 1.6rem }
+    .dash-head { flex-direction: column; gap: 10px }
+
+    .sec-heading { font-size: 1.6rem }
+    .users-grid { grid-template-columns: 1fr }
+
+    .timeline::before { left: 15px }
+    .tl-item { padding-left: 48px }
+    .tl-dot { left: 7px }
+
+    .footer-inner { flex-direction: column; text-align: center }
+    .footer-links { justify-content: center }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== NAV ===== -->
+<nav>
+    <div class="container nav-inner">
+        <a href="#" class="nav-logo">
+            <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" stroke="#0891B2" stroke-width="1.8"/><ellipse cx="16" cy="16" rx="14" ry="5" stroke="#0891B2" stroke-width="1.2"/><ellipse cx="16" cy="16" rx="5" ry="14" stroke="#0891B2" stroke-width="1.2"/></svg>
+            Nomad Visa Tracker
+        </a>
+        <button class="nav-toggle" aria-label="Toggle menu" onclick="document.querySelector('.nav-links').classList.toggle('open')">
+            <span></span><span></span><span></span>
+        </button>
+        <ul class="nav-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#problem">The 90/180 Problem</a></li>
+            <li><a href="#pricing">Pricing</a></li>
+            <li><a href="#faq">FAQ</a></li>
+            <li><a href="./app/" class="nav-cta">Get the App</a></li>
+        </ul>
+    </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+    <div class="hero-dots"></div>
+    <div class="stamp stamp-circle stamp-a"></div>
+    <div class="stamp stamp-circle stamp-b"></div>
+    <div class="stamp stamp-circle stamp-d"></div>
+    <div class="container">
+
+        <!-- Dashboard mockup -->
+        <div class="dashboard" id="dashboard">
+            <div class="dash-bar">
+                <div class="dash-dot"></div>
+                <div class="dash-dot"></div>
+                <div class="dash-dot"></div>
+                <div class="dash-bar-title">Nomad Visa Tracker</div>
+                <div style="width:30px"></div>
+            </div>
+            <div class="dash-body">
+                <div class="dash-head">
+                    <div>
+                        <div class="dash-greeting">Your Schengen Status</div>
+                        <div class="dash-date">Rolling 180-day window</div>
+                    </div>
+                    <div class="warning-badge">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        Tax alert in 12 days
+                    </div>
+                </div>
+
+                <div class="dash-rings">
+                    <!-- Schengen ring -->
+                    <div class="ring-card">
+                        <div class="ring-label">Schengen Days Used</div>
+                        <div class="ring-wrap">
+                            <svg class="ring-svg" viewBox="0 0 120 120">
+                                <circle class="ring-bg" cx="60" cy="60" r="52"/>
+                                <circle class="ring-fill ring-fill-teal" cx="60" cy="60" r="52"
+                                    stroke-dasharray="326.73"
+                                    stroke-dashoffset="326.73"
+                                    data-target="170.39"/>
+                            </svg>
+                            <div class="ring-center">
+                                <div class="ring-num">43</div>
+                                <div class="ring-of">of 90 days</div>
+                            </div>
+                        </div>
+                        <div class="ring-sub">47 days remaining</div>
+                    </div>
+
+                    <!-- US visa ring -->
+                    <div class="ring-card">
+                        <div class="ring-label">US B1/B2 Stay</div>
+                        <div class="ring-wrap">
+                            <svg class="ring-svg" viewBox="0 0 120 120">
+                                <circle class="ring-bg" cx="60" cy="60" r="52"/>
+                                <circle class="ring-fill ring-fill-amber" cx="60" cy="60" r="52"
+                                    stroke-dasharray="326.73"
+                                    stroke-dashoffset="326.73"
+                                    data-target="108.91"/>
+                            </svg>
+                            <div class="ring-center">
+                                <div class="ring-num">120</div>
+                                <div class="ring-of">of 180 days</div>
+                            </div>
+                        </div>
+                        <div class="ring-sub">60 days remaining</div>
+                    </div>
+                </div>
+
+                <!-- Country tags -->
+                <div class="dash-countries">
+                    <div class="country-tag"><span class="f">&#x1F1F5;&#x1F1F9;</span> Portugal <span class="d">18d</span></div>
+                    <div class="country-tag"><span class="f">&#x1F1EA;&#x1F1F8;</span> Spain <span class="d">12d</span></div>
+                    <div class="country-tag"><span class="f">&#x1F1E9;&#x1F1EA;</span> Germany <span class="d">8d</span></div>
+                    <div class="country-tag"><span class="f">&#x1F1EB;&#x1F1F7;</span> France <span class="d">5d</span></div>
+                    <div class="country-tag"><span class="f">&#x1F1FA;&#x1F1F8;</span> USA <span class="d">120d</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hero text -->
+        <div class="hero-text">
+            <h1>Know your limits.<br><span>Stay legal.</span></h1>
+            <p>Track Schengen 90/180-day rules, US visa limits, and tax residency thresholds in one place. No spreadsheets. No guesswork.</p>
+            <div class="hero-btns">
+                <a href="./app/" class="btn-p">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+                    Get the App &mdash; $4.99
+                </a>
+                <a href="https://github.com/xavierkain/nomad-visa-tracker" class="btn-s">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    View Source
+                </a>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ===== FEATURES TIMELINE ===== -->
+<section class="features-section" id="features">
+    <div class="container">
+        <div class="sec-label">Your Travel Itinerary</div>
+        <h2 class="sec-heading">Everything you need at every stop</h2>
+        <p class="sec-sub">Six essential tools, built for life on the move. Here is what unfolds as you travel.</p>
+
+        <div class="timeline">
+            <div class="tl-item">
+                <div class="tl-dot"></div>
+                <div class="tl-icon ic-teal">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <h3 class="tl-title">Schengen 90/180 Counter</h3>
+                <p class="tl-desc">Automatically calculates your remaining days within the rolling 180-day Schengen window. No spreadsheets, no calendar math. Just enter your trips and see where you stand.</p>
+            </div>
+
+            <div class="tl-item">
+                <div class="tl-dot"></div>
+                <div class="tl-icon ic-teal">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                </div>
+                <h3 class="tl-title">US Visa Stay Tracking</h3>
+                <p class="tl-desc">Monitor B1/B2 visa limits, ESTA 90-day caps, and the substantial presence test. Know exactly how many days you have left before you overstay.</p>
+            </div>
+
+            <div class="tl-item">
+                <div class="tl-dot"></div>
+                <div class="tl-icon ic-amber">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                </div>
+                <h3 class="tl-title">Tax Residency Warnings</h3>
+                <p class="tl-desc">Get alerts before you accidentally become a tax resident somewhere. Many countries trigger tax obligations at 183 days. You will know well in advance.</p>
+            </div>
+
+            <div class="tl-item">
+                <div class="tl-dot"></div>
+                <div class="tl-icon ic-teal">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                </div>
+                <h3 class="tl-title">Complete Trip Timeline</h3>
+                <p class="tl-desc">See your entire travel history laid out chronologically. Every entry, exit, and duration is logged and searchable. Your personal travel record, always accessible.</p>
+            </div>
+
+            <div class="tl-item">
+                <div class="tl-dot"></div>
+                <div class="tl-icon ic-green">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                </div>
+                <h3 class="tl-title">Country-by-Country Stats</h3>
+                <p class="tl-desc">Detailed breakdowns of days spent in each country. Spot patterns, plan ahead, and keep records tidy for visa applications or tax filings.</p>
+            </div>
+
+            <div class="tl-item">
+                <div class="tl-dot"></div>
+                <div class="tl-icon ic-teal">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <h3 class="tl-title">Offline-First, Always</h3>
+                <p class="tl-desc">Works without an internet connection. Your data stays on your device. No accounts, no cloud sync, no tracking. Open the app anywhere in the world and it just works.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== THE 90/180 PROBLEM ===== -->
+<section class="problem-section" id="problem">
+    <div class="stamp stamp-rect stamp-c"></div>
+    <div class="container">
+        <div class="problem-grid">
+            <div class="problem-content">
+                <div class="sec-label">The challenge</div>
+                <h2 class="sec-heading">The 90/180 problem, explained</h2>
+                <p class="sec-sub">The Schengen Area lets you stay 90 days within any 180-day rolling window. Sounds simple. It is not.</p>
+                <ul class="prob-list">
+                    <li>
+                        <div class="prob-icon ic-r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+                        <span>It is <strong>not</strong> 90 days per calendar year. The 180-day window rolls forward every single day, recalculating what counts.</span>
+                    </li>
+                    <li>
+                        <div class="prob-icon ic-r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+                        <span>Multiple short trips make manual counting nearly impossible. A week in Spain, two in Portugal, a weekend in France &mdash; it adds up fast.</span>
+                    </li>
+                    <li>
+                        <div class="prob-icon ic-r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+                        <span>Overstaying can mean fines, entry bans, or deportation. Border agents will check your stamps.</span>
+                    </li>
+                    <li>
+                        <div class="prob-icon ic-g"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                        <span><strong>Nomad Visa Tracker does the math for you.</strong> Enter your trips, and the rolling window calculation happens automatically. Always accurate, always up to date.</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="problem-visual">
+                <div class="window-card" id="window-card">
+                    <div class="window-title">180-Day Rolling Window</div>
+                    <div class="window-bars">
+                        <div class="wb">
+                            <div class="wb-label"><span>Mar &mdash; Aug 2024</span><span>32 / 90 days</span></div>
+                            <div class="wb-track"><div class="wb-fill safe" style="width:0%" data-w="36%"></div></div>
+                        </div>
+                        <div class="wb">
+                            <div class="wb-label"><span>Jun &mdash; Nov 2024</span><span>61 / 90 days</span></div>
+                            <div class="wb-track"><div class="wb-fill warn" style="width:0%" data-w="68%"></div></div>
+                        </div>
+                        <div class="wb">
+                            <div class="wb-label"><span>Sep 2024 &mdash; Feb 2025</span><span>84 / 90 days</span></div>
+                            <div class="wb-track"><div class="wb-fill danger" style="width:0%" data-w="93%"></div></div>
+                        </div>
+                    </div>
+                    <div class="window-note">As the window rolls forward, old days expire and new days count. The tracker recalculates continuously so you always know your real limit.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== WHO USES IT ===== -->
+<section class="users-section" id="users">
+    <div class="container">
+        <div class="sec-label">Built for the mobile lifestyle</div>
+        <h2 class="sec-heading">Who uses Nomad Visa Tracker?</h2>
+        <p class="sec-sub">From Bali co-working spaces to Berlin apartments, travelers worldwide rely on clear visa data.</p>
+
+        <div class="users-grid">
+            <div class="u-card">
+                <div class="u-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
+                </div>
+                <h3>Digital Nomads</h3>
+                <p>Hopping between Schengen countries while working remotely. Track visa days so you can focus on your work, not calendar math.</p>
+            </div>
+            <div class="u-card">
+                <div class="u-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>
+                </div>
+                <h3>Frequent Travelers</h3>
+                <p>Business travelers, conference-hoppers, and explorers making multiple trips per year who need to track cumulative days.</p>
+            </div>
+            <div class="u-card">
+                <div class="u-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                </div>
+                <h3>Remote Workers Abroad</h3>
+                <p>Employees working from another country on tourist visas. Stay within legal limits and avoid triggering tax residency.</p>
+            </div>
+            <div class="u-card">
+                <div class="u-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                </div>
+                <h3>Tax Advisors</h3>
+                <p>Professionals managing clients with international travel. Get accurate day counts for tax residency determinations.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== PRICING ===== -->
+<section class="pricing-section" id="pricing">
+    <div class="container">
+        <div class="sec-label">Simple, honest pricing</div>
+        <h2 class="sec-heading">One price. Yours forever.</h2>
+        <p class="sec-sub">No subscriptions. No upsells. Pay once, use it for life.</p>
+
+        <div class="p-card">
+            <div class="p-card-head">
+                <div class="p-badge">One-time purchase</div>
+                <div class="p-amount"><span>$</span>4.99</div>
+                <div class="p-note">Pay once, own it forever</div>
+            </div>
+            <div class="p-card-body">
+                <ul class="p-feats">
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Schengen 90/180 rolling calculator</li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> US visa stay tracking</li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Tax residency threshold alerts</li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Complete trip timeline and stats</li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Offline-first &mdash; works anywhere</li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> All future updates included</li>
+                </ul>
+                <a href="./app/" class="p-cta">Get Nomad Visa Tracker</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section class="faq-section" id="faq">
+    <div class="container">
+        <div class="sec-label">Common questions</div>
+        <h2 class="sec-heading">Frequently Asked Questions</h2>
+
+        <div class="faq-list">
+            <details>
+                <summary>How does the Schengen 90/180 rule actually work?</summary>
+                <div class="faq-answer">The Schengen Area allows non-EU citizens to stay up to 90 days within any rolling 180-day period. The key word is "rolling" &mdash; the 180-day window shifts forward every day, and each day the system checks backward 180 days to count how many of those you spent in Schengen territory. Nomad Visa Tracker handles this calculation automatically as you log your trips.</div>
+            </details>
+            <details>
+                <summary>Does the app track US visa limits too?</summary>
+                <div class="faq-answer">Yes. Beyond Schengen, the app tracks US B1/B2 visa and ESTA limitations. It monitors your cumulative days of stay and can alert you before you approach limits that could affect future visa applications or trigger the IRS substantial presence test.</div>
+            </details>
+            <details>
+                <summary>What are the tax residency warnings?</summary>
+                <div class="faq-answer">Many countries consider you a tax resident if you spend more than 183 days per year in their territory. Nomad Visa Tracker monitors your days per country and warns you well before you hit these thresholds, giving you time to plan your next move.</div>
+            </details>
+            <details>
+                <summary>Does it work offline?</summary>
+                <div class="faq-answer">Absolutely. The app is built offline-first. All your data is stored locally on your device. No internet connection is needed to log trips, check your remaining days, or receive alerts. This is critical when you are at a border crossing with no signal.</div>
+            </details>
+            <details>
+                <summary>Is my data private?</summary>
+                <div class="faq-answer">Your data never leaves your device. There are no accounts to create, no cloud sync, and no analytics tracking your usage. The app is open-source on GitHub, so you can verify this yourself.</div>
+            </details>
+            <details>
+                <summary>Is this a subscription?</summary>
+                <div class="faq-answer">No. Nomad Visa Tracker is a one-time purchase of $4.99. You pay once and own it forever, including all future updates. No recurring charges, no premium tiers, no in-app purchases.</div>
+            </details>
+            <details>
+                <summary>Can I use it for planning future trips?</summary>
+                <div class="faq-answer">Yes. You can add future trip dates to see how they would affect your day counts. This makes it easy to plan upcoming travel without accidentally exceeding any limits.</div>
+            </details>
+        </div>
+    </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+    <div class="container footer-inner">
+        <div class="footer-brand">
+            <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" stroke="#06B6D4" stroke-width="1.8"/><ellipse cx="16" cy="16" rx="14" ry="5" stroke="#06B6D4" stroke-width="1.2"/><ellipse cx="16" cy="16" rx="5" ry="14" stroke="#06B6D4" stroke-width="1.2"/></svg>
+            Nomad Visa Tracker
+        </div>
+        <ul class="footer-links">
+            <li><a href="https://github.com/xavierkain/nomad-visa-tracker">GitHub</a></li>
+            <li><a href="/blog/">Blog</a></li>
+            <li><a href="/privacy/">Privacy</a></li>
+            <li><a href="./app/">Get the App</a></li>
+        </ul>
+        <div class="footer-copy">&copy; 2025 Nomad Visa Tracker. All rights reserved.</div>
+    </div>
+</footer>
+
+<!-- ===== SCRIPTS ===== -->
+<script>
+(function() {
+    // Intersection observer for scroll-triggered animations
+    var io = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+            if (!e.isIntersecting) return;
+
+            // Animate progress rings
+            var rings = e.target.querySelectorAll('.ring-fill[data-target]');
+            rings.forEach(function(r) {
+                var t = parseFloat(r.getAttribute('data-target'));
+                setTimeout(function() { r.style.strokeDashoffset = t; }, 250);
+            });
+
+            // Animate window bars
+            var bars = e.target.querySelectorAll('.wb-fill[data-w]');
+            bars.forEach(function(b, i) {
+                setTimeout(function() {
+                    b.style.width = b.getAttribute('data-w');
+                }, 250 + i * 120);
+            });
+
+            io.unobserve(e.target);
+        });
+    }, { threshold: 0.25 });
+
+    var d = document.getElementById('dashboard');
+    var w = document.getElementById('window-card');
+    if (d) io.observe(d);
+    if (w) io.observe(w);
+
+    // Close mobile nav on link click
+    document.querySelectorAll('.nav-links a').forEach(function(a) {
+        a.addEventListener('click', function() {
+            document.querySelector('.nav-links').classList.remove('open');
+        });
+    });
+})();
+</script>
+</body>
+</html>
